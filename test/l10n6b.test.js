@@ -157,11 +157,30 @@ test('L10N6b the command line, the sources, the prompt\'s rules; and the in-sess
   for (const code of langs) {
     const rows = new Map(parseStringTableCsv(rd(`locales/${code}/Port_Strings.csv`)));
     const meta = JSON.parse(rd(`locales/${code}/Port_Strings.meta.json`));
-    const plan = planRun(en, rows, meta);
-    // L10N6 (the first batch): a language still drafting owes rows, a row whose English moved among them - none it holds
-    // is mistaken for a person's
-    if (catalogLocale(code)?.drafting) assert.deepEqual(plan.human, [], `${code}: every row it holds the machine's`);
-    else assert.deepEqual([plan.draft, plan.human], [[], []], `${code}: every row the machine's and current`);
+    // The online Korean pack targets app-v0.1.9050, not this older game
+    // checkout. Keep the original machine hashes and every manually edited
+    // Korean value; planRun must recognize edits as human-owned, never silently
+    // overwrite them or invent a new source provenance.
+    const reference = code === 'ko'
+      ? new Map(parseStringTableCsv(rd('tools/ko/reference/app-v0.1.9050.en.csv')))
+      : en;
+    const plan = planRun(reference, rows, meta);
+    if (code === 'ko') {
+      assert.equal(reference.size, 3916, 'the official app-v0.1.9050 source is pinned');
+      assert.deepEqual([...rows.keys()].sort(), [...reference.keys()].sort(), 'no Korean key silently removed');
+      assert.equal(plan.done.length + plan.human.length + plan.draft.length, reference.size,
+        'every Korean row is classified as original machine text, protected human edit or source-changed draft');
+      assert.ok(plan.human.length > 0, 'a corrected Korean translation must not be treated as an untouched machine draft');
+      assert.ok(plan.human.every(k => plan.meta[k]?.by === 'human'), 'manual corrections remain human-owned');
+      assert.ok(plan.stale.every(k => plan.human.includes(k)), 'stale human translations are flagged for review');
+      // Main integration remains blocked until source synchronization and a
+      // fresh metadata audit; this test only validates preservation/provenance.
+    } else {
+      // L10N6 (the first batch): no unexpected hand edits in the port's other
+      // machine-generated locale tables.
+      if (catalogLocale(code)?.drafting) assert.deepEqual(plan.human, [], `${code}: every row it holds the machine's`);
+      else assert.deepEqual([plan.draft, plan.human], [[], []], `${code}: every row the machine's and current`);
+    }
     assert.ok(Object.values(meta).every((m) => m.by === 'claude-in-session'));
   }
 });
