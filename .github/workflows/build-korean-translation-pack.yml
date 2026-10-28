@@ -59,13 +59,13 @@ jobs:
         run: |
           python3 tools/ko/build_online_korean_pack.py \
             --dfu-path _dfu-korean \
-            --output Daggerfall_Online_Korean_Combined.zip
+            --output DFO_Online_Korean_Combined.zip
 
       - name: Verify archive structure
         run: |
           python3 - <<'PY'
           import zipfile
-          with zipfile.ZipFile('Daggerfall_Online_Korean_Combined.zip') as z:
+          with zipfile.ZipFile('DFO_Online_Korean_Combined.zip') as z:
               entries = set(z.namelist())
               assert 'Text/Port_Strings.csv' in entries
               assert any(p.startswith('Text/Quests/') for p in entries)
@@ -77,7 +77,7 @@ jobs:
       - name: Publish downloadable test archive
         uses: actions/upload-artifact@v4
         with:
-          name: Daggerfall-Online-Korean-Test
-          path: Daggerfall_Online_Korean_Combined.zip
+          name: DFO-Online-Korean-Test
+          path: DFO_Online_Korean_Combined.zip
           if-no-files-found: error
           retention-days: 30

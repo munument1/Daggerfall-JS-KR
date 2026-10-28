@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a Daggerfall Online Korean translation pack from the DFU Korean patch.
+"""Build a DFO Online Korean translation pack from the DFU Korean patch.
 
 Requires Python 3.10+. Only uses the standard library.
 Examples:
@@ -20,8 +20,8 @@ import zipfile
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PORT_CSV = REPO_ROOT / "locales" / "ko" / "Port_Strings.csv"
-ENGLISH_CSV = REPO_ROOT / "tools" / "ko" / "reference" / "app-v0.1.8840.en.csv"
-DEFAULT_OUTPUT = Path("Daggerfall_Online_Korean_Combined.zip")
+ENGLISH_CSV = REPO_ROOT / "tools" / "ko" / "reference" / "app-v0.1.9050.en.csv"
+DEFAULT_OUTPUT = Path("DFO_Online_Korean_Combined.zip")
 
 
 def classify(path: str) -> tuple[str, str] | None:
@@ -147,7 +147,7 @@ def build(dfu_path: Path, output: Path, english_path: Path = ENGLISH_CSV,
         for _, (name, data, _) in sorted(selected.items()):
             package.writestr(name, data)
         package.writestr("README_Online_Korean.txt",
-            "Daggerfall Online Korean combined translation pack.\n"
+            "DFO Online Korean combined translation pack.\n"
             "Source: munument1/-KR-Daggerfall_Unity and munument1/-KR-daggerfall-js.\n"
             "Install under Settings > Interface > Language: Korean > Translation pack.\n"
             "Only DFU-compatible Text/Fonts and online-specific Port_Strings are included.\n"

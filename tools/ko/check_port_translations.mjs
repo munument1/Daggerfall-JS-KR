@@ -10,7 +10,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const read = p => readFileSync(resolve(root, p), 'utf8').replace(/^\uFEFF/, '');
 const args = process.argv.slice(2);
 const option = (name, fallback) => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
-const enPath = option('--english', 'tools/ko/reference/app-v0.1.8840.en.csv');
+const enPath = option('--english', 'tools/ko/reference/app-v0.1.9050.en.csv');
 const koPath = option('--korean', 'locales/ko/Port_Strings.csv');
 const errors = [];
 
