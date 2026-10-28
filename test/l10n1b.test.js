@@ -84,6 +84,13 @@ test('L10N1b the English catalog is read off the source and in step with it: eve
 
 test('L10N1b every language\'s file: DFU\'s format as the port writes it, the English catalog\'s keys exactly, every value a readable pattern naming the English\'s arguments - and every visible catalog language has one, and no folder is outside the catalog', () => {
   const en = new Map(tm.parseStringTableCsv(rd(CATALOG_PATH)));
+  // A test-only Korean pack is pinned to the newer official app-v0.1.9050 catalogue.
+  // The game code on this branch still uses the older English source; do not delete
+  // valid newer translations to satisfy a test for the older runtime, and do not
+  // interpret this test as permission to merge the pack into the current game.
+  const koPackEn = new Map(tm.parseStringTableCsv(rd('tools/ko/reference/app-v0.1.9050.en.csv')));
+  assert.equal(koPackEn.size, 3916, 'the versioned Korean pack pins all 3,916 official English keys');
+  assert.ok(koPackEn.size > en.size, 'a game-source sync is still required before main integration');
   const dirs = readdirSync(new URL('../locales/', import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
   for (const d of dirs) assert.ok(catalogLocale(d), `locales/${d} is not a catalog language`);
   for (const l of LOCALE_CATALOG.filter((x) => x.source === 'machine')) {
@@ -93,14 +100,16 @@ test('L10N1b every language\'s file: DFU\'s format as the port writes it, the En
     const rows = tm.parseStringTableCsv(text);
     assert.equal(tm.formatStringTableCsv(rows), text, `${path} is in the port's own form (the writer's)`);
     const map = new Map(rows);
-    // L10N6 (the first batch, 2026-10-13): a language still `drafting` holds part of the catalog and is not offered on
-    // it (test below); every other language holds the catalog exactly
-    if (l.drafting) assert.deepEqual([...map.keys()].filter((k) => !en.has(k)), [], `${l.code}'s part-drafts name only catalog keys`);
-    else assert.deepEqual([...map.keys()].sort(), [...en.keys()].sort(), `${l.code} covers the catalog`);
+    const reference = l.code === 'ko' ? koPackEn : en;
+    // L10N6's normal drafts remain pinned to the source this game executes.
+    // The Korean *pack* is separately versioned: validate it against the
+    // exact pinned original, not against the older English runtime keys.
+    if (l.drafting) assert.deepEqual([...map.keys()].filter((k) => !reference.has(k)), [], `${l.code}'s part-drafts name only catalog keys`);
+    else assert.deepEqual([...map.keys()].sort(), [...reference.keys()].sort(), `${l.code} covers its pinned English catalog`);
     for (const [k, v] of map) {
       assert.ok(v.trim(), `${l.code} ${k} is empty`);
       assert.doesNotThrow(() => tm.parseMessage(v), `${l.code} ${k} is not a readable pattern`);
-      assert.deepEqual(argNames(v), argNames(en.get(k)), `${l.code} ${k} names other arguments than the English`);
+      assert.deepEqual(argNames(v), argNames(reference.get(k)), `${l.code} ${k} names other arguments than the English`);
     }
   }
 });

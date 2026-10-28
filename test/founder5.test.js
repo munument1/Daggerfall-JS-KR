@@ -212,12 +212,20 @@ test('FOUNDER5 the live link, a cloud save: an account registered long after the
   assert.deepEqual(await s.titles(lone), [], 'a character of its own alone: none');
   assert.equal(s.raw.prepare('SELECT first_played_at FROM players WHERE id = ?').get(lone.id).first_played_at, null);
 
-  const late = await s.guest(OLD_CUT + 30 * DAY);   // a row after the cutoff holding the same character changes nothing
+  // This date is after the Founder cutoff but before today (as of 2026-10-28).
+  // FOUNDER5 records an earlier character's first play *even if that date
+  // does not qualify for the title*. Previously this test happened to pass
+  // because the chosen October 25 timestamp was still in the future and
+  // therefore later than the newly registered account. Do not make Founder
+  // eligibility depend on the wall clock at which the test suite runs.
+  const lateFirstPlay = OLD_CUT + 30 * DAY;
+  const late = await s.guest(lateFirstPlay);
   s.raw.prepare('INSERT INTO realm_census (player, char_id) VALUES (?, ?)').run(late.id, 'c0ffee00-1111-2222-3333-444455556666');
   const third = await s.account('Third');
   assert.equal((await s.card(third, 'c0ffee00-1111-2222-3333-444455556666')).status, 200);
   assert.deepEqual(await s.titles(third), [], 'linked to a row first seen after the cutoff: none');
-  assert.equal(s.raw.prepare('SELECT first_played_at FROM players WHERE id = ?').get(third.id).first_played_at, null, 'and nothing written: a link to a LATER first play records nothing');
+  assert.equal(s.raw.prepare('SELECT first_played_at FROM players WHERE id = ?').get(third.id).first_played_at,
+    lateFirstPlay, 'the real first-play date is recorded, but never grants Founder after the cutoff');
 });
 
 test('FOUNDER5 the live link, a customs: an account that brings in, on its pass, a character a guest from before the cutoff played holds Founder at once', async () => {
