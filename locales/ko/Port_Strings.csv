@@ -2103,7 +2103,7 @@ prof.page.jewel.cracked,"공성전 중 금이 간 보석 장착: {gem} (보관: 
 prof.page.jewel.down,"돌을 내려놓았습니다. 아무것도 쓰지 않았습니다."
 prof.page.jewel.home,"당신의 보석 세공대."
 prof.page.jewel.how,"면({name}) - 돌이 빛을 받는 순간 회전을 멈추세요(Space): {n, plural, other {면 #개}}"
-prof.page.jewel.odds,"숙련도 {rank}, 여유 {margin}: {odds}{steps, plural, =0 {} other { (마을 약제상에서 +#단계)}}. 깔끔한 면은 한 단계 더 좋습니다. {profession} XP {xp}."
+prof.page.jewel.odds,"숙련도 {rank}, 여유 {margin}: {odds}{steps, plural, =0 {} other { (마을 약제상에서 +#단계)}}. 깔끔한 면은 한 단계 더 좋습니다."
 prof.page.jewel.points,"마법 부여 점수 {pts, number}"
 prof.page.jewel.pointsNote,"{points}{hand, select, goldsmith { - 금세공사의 은, 금으로 계산} gemcutter { - 보석 연마사의 보석} other {}}. 아이템 제작기가 이 점수를 씁니다{wand, select, yes {} other {(걸작 고유의 마법 부여와 별도로)}}."
 prof.page.jewel.pointsPct,"마법 부여 점수 {pts, number} (+{pct}%)"
